@@ -1,0 +1,58 @@
+pipeline {
+    agent { label 'docker-node' }
+    environment {
+        VM_USER = "jenkins"
+        VM_HOST = "172.24.238.159"
+    }
+
+    stages {
+        stage('Checkout') {
+            steps {
+                checkout scm
+            }
+        }
+
+        stage('Build & Test') {
+            agent {
+                docker {
+                    image 'maven:3.9.3-eclipse-temurin-17'
+                    args '-v $HOME/.m2:/root/.m2' // Opcional: cache de dependencias Maven
+                }
+            }
+            steps {
+                sh 'mvn -B clean package'
+            }
+        }
+
+        stage('Deploy with Docker') {
+        steps {
+            script {
+                // Usa la llave SSH registrada en Jenkins (ID: aws_agente)
+                sshagent (credentials: ['aws_agente']) {
+                    // Limpiar carpeta en la VM
+                    sh """
+                        ssh -o StrictHostKeyChecking=no $VM_USER@$VM_HOST 'rm -rf /tmp/app && mkdir -p /tmp/app'
+                    """
+
+                    // Subir proyecto a la VM
+                    sh """
+                        scp -o StrictHostKeyChecking=no -r * $VM_USER@$VM_HOST:/tmp/app
+                    """
+
+                    // Desplegar usando docker compose
+                    sh """
+                        ssh -o StrictHostKeyChecking=no $VM_USER@$VM_HOST 'cd /tmp/app && docker compose down || true && docker compose up -d --build'
+                    """
+            }
+        }
+    }
+}
+    }
+
+    post {
+        always {
+            junit '**/target/surefire-reports/*.xml'
+            archiveArtifacts artifacts: 'target/*.jar', fingerprint: true
+        }
+    }
+}
