@@ -17,4 +17,9 @@ public class DemoApplication {
     public String healthCheck() {
         return "OK";
     }
+
+    @GetMapping("/saludo")
+    public String saludo() {
+        return "Hola soy Roger Rojas y esta es la tarea del laboratorio 6";
+    }
 }
