@@ -7,7 +7,8 @@ pipeline {
     stages {
         stage('Clone Repository') {
             steps {
-                git 'https://github.com/Roger-Rojas-2000/laboratorio6.git'
+                git branch: 'main', 
+                    url: 'https://github.com/Roger-Rojas-2000/laboratorio6.git'
             }
         }
         stage('Build') {
