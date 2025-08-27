@@ -31,7 +31,7 @@ pipeline {
                 sh 'mvn jacoco:report'
             }
         }
-        stage('Deploy to Staging') {
+        
             stage('Copy Artifact') {
                 steps {
                     sshagent(['jenkis-spring-docker-key']) {
@@ -70,7 +70,7 @@ pipeline {
                 sh 'scp target/${ARTIFACT_NAME} $STAGING_SERVER:/home/spring_user_java/staging/'
                 sh 'ssh $STAGING_SERVER "nohup java -jar /home/spring_user_java/staging/${ARTIFACT_NAME} > /dev/null 2>&1 &"'
             } */
-        }
+        
         stage('Validate Deployment') {
             steps {
                 sh 'sleep 20'
