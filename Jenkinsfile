@@ -18,8 +18,8 @@ pipeline {
         }
         stage('Code Quality') {
             steps {
-                //sh 'mvn checkstyle:check'
-                echo 'Code Quality successfuylly.'
+                sh 'mvn checkstyle:check'
+                //echo 'Code Quality successfuylly.'
             }
         }
         stage('Test') {
