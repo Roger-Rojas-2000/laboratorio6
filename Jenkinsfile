@@ -36,7 +36,7 @@ pipeline {
             stage('Copy Artifact') {
                 steps {
                     sshagent(['jenkis-spring-docker-key']) {
-                        sh 'scp target/${ARTIFACT_NAME} $STAGING_SERVER:/home/spring_user_java/staging/'
+                        sh 'scp -o StrictHostKeyChecking=no target/${ARTIFACT_NAME} $STAGING_SERVER:/home/spring_user_java/staging/'
                     }
                 }
             }
